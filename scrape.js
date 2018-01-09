@@ -40,7 +40,7 @@ var channel_list = {};
 function start_bf(){
 	
     var ws = new WebSocket('wss://api.bitfinex.com/ws/');
-	var shit = false;
+	var handled = 0;
 	var timeoutObj;
 	
 	ws.onopen = () => {
@@ -85,34 +85,30 @@ function start_bf(){
 			bf[pairname].ask = obj[3];
 			//handleNewData();
 			timeoutObj = setTimeout(() => {
-				console.log(getDateTime() + ' No new data received from Bitfinex for 60 seconds. Reconnecting websocket in 10 seconds.');
-				shit = true;
+				console.log(getDateTime() + ' No new data received from Bitfinex for 60 seconds.');
 				reconnect_bf();
 			}, 60*1000);
 		}
 	});
 	
     ws.onclose = function(){
-		shit = true;
 		reconnect_bf();
 		console.log(getDateTime() + ' Bitfinex socket closed.');
     };
 	
 	ws.onerror = function(){
-		shit = true;
 		reconnect_bf();
 		console.log(getDateTime() + ' Bitfinex error occured.');
     };
 	
 	function reconnect_bf(){
-		setTimeout(function(){
-			if (shit) {
-				shit = false;
+		if (handled++ == 0){
+			setTimeout(function(){
 				console.log(getDateTime() + ' Bitfinex websocket reconnecting.');
 				ws.close();
 				start_bf();
-			}
-		}, 10000);
+			}, 10000);
+		}
 	}
 	
 }
@@ -120,7 +116,7 @@ function start_bf(){
 function start_bm(){
 	
 	var ws = new WebSocket('wss://www.bitmex.com/realtime');
-	var shit = false;
+	var handled = 0;
 	var timeoutObj;
 	
 	ws.onopen = () => {
@@ -148,8 +144,7 @@ function start_bm(){
 				bm[obj.data[0].symbol].ask = obj.data[0].askPrice;
 			}
 			timeoutObj = setTimeout(() => {
-				console.log(getDateTime() + ' No new data received from Bitmex for 60 seconds. Reconnecting websocket in 10 seconds');
-				shit = true;
+				console.log(getDateTime() + ' No new data received from Bitmex for 60 seconds.');
 				reconnect_bm();
 			}, 60*1000);
 		} else {
@@ -158,26 +153,23 @@ function start_bm(){
 	});
 	
     ws.onclose = function(){
-		shit = true;
 		reconnect_bm();
 		console.log(getDateTime() + ' Bitmex socket closed.');
     };
 	
 	ws.onerror = function(){
-		shit = true;
 		reconnect_bm();
 		console.log(getDateTime() + ' Bitmex error occured');
     };
 	
 	function reconnect_bm(){
-		setTimeout(function(){
-			if (shit) {
-				shit = false;
+		if (handled++ == 0){
+			setTimeout(function(){
 				console.log(getDateTime() + ' Bitmex websocket reconnecting.');
 				ws.close();
 				start_bm();
-			}
-		}, 10000);
+			}, 10000);
+		}
 	}
 	
 }
