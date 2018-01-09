@@ -3,29 +3,29 @@ const BitMEXClient = require('bitmex-realtime-api');
 const fs = require('fs');
 
 var pairs = {
-	BTC:{futures:'bm.XBTZ17', spot:'bm.XBTUSD'},
-	DSH:{futures:'bm.DASHZ17', spot:'bf.DSHBTC'},
-	ETH:{futures:'bm.ETHZ17', spot:'bf.ETHBTC'},
-	ETC:{futures:'bm.ETC7D', spot:'bf.ETCBTC'},
-	LTC:{futures:'bm.LTCZ17', spot:'bf.LTCBTC'},
-	XMR:{futures:'bm.XMRZ17', spot:'bf.XMRBTC'},
-	XRP:{futures:'bm.XRPZ17', spot:'bf.XRPBTC'},
-	ZEC:{futures:'bm.ZECZ17', spot:'bf.ZECBTC'},
+	BCH:{futures:'BCHF18', spot:'BCHBTC'},
+	DSH:{futures:'DASHH18', spot:'DSHBTC'},
+	ETH:{futures:'ETHH18', spot:'ETHBTC'},
+	ETC:{futures:'ETC7D', spot:'ETCBTC'},
+	LTC:{futures:'LTCH18', spot:'LTCBTC'},
+	XMR:{futures:'XMRH18', spot:'XMRBTC'},
+	XRP:{futures:'XRPH18', spot:'XRPBTC'},
+	ZEC:{futures:'ZECH18', spot:'ZECBTC'},
 };
 
 var bm = {
-	'XBTUSD':{bid:0, ask:0}, 
-	'XBTZ17':{bid:0, ask:0}, 
-	'DASHZ17':{bid:0, ask:0}, 
-	'ETHZ17':{bid:0, ask:0}, 
+	'BCHF18':{bid:0, ask:0}, 
+	'DASHH18':{bid:0, ask:0}, 
+	'ETHH18':{bid:0, ask:0}, 
 	'ETC7D':{bid:0, ask:0},
-	'LTCZ17':{bid:0, ask:0},
-	'XMRZ17':{bid:0, ask:0},
-	'XRPZ17':{bid:0, ask:0},
-	'ZECZ17':{bid:0, ask:0}, 
+	'LTCH18':{bid:0, ask:0},
+	'XMRH18':{bid:0, ask:0},
+	'XRPH18':{bid:0, ask:0},
+	'ZECH18':{bid:0, ask:0}, 
 };
 
 var bf = {
+	'BCHBTC':{bid:0, ask:0},
 	'DSHBTC':{bid:0, ask:0}, 
 	'ETHBTC':{bid:0, ask:0}, 
 	'ETCBTC':{bid:0, ask:0}, 
@@ -85,7 +85,7 @@ function start_bf(){
 			bf[pairname].ask = obj[3];
 			//handleNewData();
 			timeoutObj = setTimeout(() => {
-				console.log(getDateTime() + ' No new data received from Bitfinex for 60 seconds. Resconnecting websocket now.');
+				console.log(getDateTime() + ' No new data received from Bitfinex for 60 seconds. Reconnecting websocket in 10 seconds.');
 				shit = true;
 				reconnect_bf();
 			}, 60*1000);
@@ -148,7 +148,7 @@ function start_bm(){
 				bm[obj.data[0].symbol].ask = obj.data[0].askPrice;
 			}
 			timeoutObj = setTimeout(() => {
-				console.log(getDateTime() + ' No new data received from Bitmex for 60 seconds. Resconnecting websocket now.');
+				console.log(getDateTime() + ' No new data received from Bitmex for 60 seconds. Reconnecting websocket in 10 seconds');
 				shit = true;
 				reconnect_bm();
 			}, 60*1000);
@@ -166,7 +166,7 @@ function start_bm(){
 	ws.onerror = function(){
 		shit = true;
 		reconnect_bm();
-		console.log(getDateTime() + ' Bitmex shit occured');
+		console.log(getDateTime() + ' Bitmex error occured');
     };
 	
 	function reconnect_bm(){
@@ -185,8 +185,8 @@ function start_bm(){
 function handleNewData(){
 	/*for (var i in pairs){
 		console.log(i);
-		console.log('Bitfinex: ' + pairs[i].bf.bid + ' ' + pairs[i].bf.ask);
-		console.log('Bitmex: ' + pairs[i].bm.bid + ' ' + pairs[i].bm.ask);
+		console.log('Bitfinex: ' + eval('bf.' + pairs[i].spot).bid + ' ' + eval('bf.' + pairs[i].spot).ask;
+		console.log('Bitmex: ' + eval('bm.' + pairs[i].futures).bid + ' ' + eval('bm.' + pairs[i].futures).ask;
 	}*/
 }
 
@@ -194,12 +194,9 @@ function printAll(){
 	//process.stdout.write('\033c');
 	for (var i in pairs){
 		// time, spot bid, spot ask, futures bid, futures ask
-		fs.appendFile('output\\' + i + '.csv', getDateTime() + ',' + eval(pairs[i].spot).bid + ',' + eval(pairs[i].spot).ask + ',' + eval(pairs[i].futures).bid + ',' + eval(pairs[i].futures).ask + '\r\n', (err) => {  
+		fs.appendFile('output\\' + i + '.csv', getDateTime() + ',' + eval('bf.' + pairs[i].spot).bid + ',' + eval('bf.' + pairs[i].spot).ask + ',' + eval('bm.' + pairs[i].futures).bid + ',' + eval('bm.' + pairs[i].futures).ask + '\r\n', (err) => {  
 			if (err) console.log(err);
 		});
-		/*console.log(i);
-		console.log('Spot: ' + eval(pairs[i].spot).bid + ' ' + eval(pairs[i].spot).ask);
-		console.log('Futures: ' + eval(pairs[i].futures).bid + ' ' + eval(pairs[i].futures).ask);*/
 	}
 	
 }
